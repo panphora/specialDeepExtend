@@ -1,0 +1,23 @@
+{
+  "name": "specialDeepExtend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "specialDeepExtend.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panphora/specialDeepExtend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/panphora/specialDeepExtend/issues"
+  },
+  "homepage": "https://github.com/panphora/specialDeepExtend#readme",
+  "dependencies": {
+    "deep-equal": "^1.0.1"
+  }
+}
