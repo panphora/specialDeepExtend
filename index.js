@@ -46,6 +46,34 @@ let testSourceObjects = [
         ]
       },
     ]
+  },
+  {
+    id: "6",
+    text: "a",
+    choices: [
+      {
+        id: "1",
+        choiceText: "b",
+        choices: [
+          {
+            id: "3",
+            choiceText: "d",
+            choices: []
+          }
+        ]
+      },
+      {
+        id: "2",
+        choiceText: "c",
+        choices: [
+          {
+            id: "4",
+            choiceText: "e",
+            choices: []
+          }
+        ]
+      }
+    ]
   }
 ];
 
@@ -79,6 +107,20 @@ let testTargetObjects = [
         ]
       },
     ]
+  },
+  {
+    id: "6",
+    text: "a",
+    choices: [
+      {
+        id: "1",
+        choiceText: "bbbb"
+      },
+      {
+        id: "2",
+        choiceText: "cccc"
+      }
+    ]
   }
 ];
 
@@ -111,6 +153,34 @@ let testExpectedOutputs = [
           }
         ]
       },
+    ]
+  },
+  {
+    id: "6",
+    text: "a",
+    choices: [
+      {
+        id: "1",
+        choiceText: "bbbb",
+        choices: [
+          {
+            id: "3",
+            choiceText: "d",
+            choices: []
+          }
+        ]
+      },
+      {
+        id: "2",
+        choiceText: "cccc",
+        choices: [
+          {
+            id: "4",
+            choiceText: "e",
+            choices: []
+          }
+        ]
+      }
     ]
   }
 ];
