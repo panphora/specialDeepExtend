@@ -74,7 +74,18 @@ let testSourceObjects = [
         ]
       }
     ]
-  }
+  },
+  [
+    {
+      id: "1", 
+      children: [
+        {
+          id: "2", 
+          extraData: "h"
+        }
+      ]
+    }
+  ]
 ];
 
 let testTargetObjects = [
@@ -121,7 +132,17 @@ let testTargetObjects = [
         choiceText: "cccc"
       }
     ]
-  }
+  },
+  [
+    {
+      id: "1", 
+      children: [
+        {
+          id: "2"
+        }
+      ]
+    }
+  ]
 ];
 
 let testExpectedOutputs = [
@@ -182,7 +203,18 @@ let testExpectedOutputs = [
         ]
       }
     ]
-  }
+  },
+  [
+    {
+      id: "1", 
+      children: [
+        {
+          id: "2", 
+          extraData: "h"
+        }
+      ]
+    }
+  ]
 ];
 
 
@@ -193,6 +225,8 @@ testSourceObjects.forEach(function (testSourceObject, i) {
   let output = specialDeepExtend(testSourceObject, testTargetObject);
 
   console.log(`test ${i}:`, deepEqual(output, testExpectedOutput) ? "PASSED" : "FAILED");
+  console.log(1, JSON.stringify(output));
+  console.log(2, JSON.stringify(testExpectedOutput));
 });
 
 
@@ -218,7 +252,7 @@ function specialDeepExtend (sourceOriginal, targetOriginal) {
 }
 
 // this function will modify data, while the parent specialDeepExtend will not
-function _specialDeepExtend (source, target, parentKey, parent) {
+function _specialDeepExtend (source, target, parentKey, parent, dontOverwriteKeysWithPlainValues) {
   let sourceType = getDataType(source);
   let targetType = getDataType(target);
 
@@ -229,7 +263,7 @@ function _specialDeepExtend (source, target, parentKey, parent) {
 
       if (targetValueType === "array" || targetValueType === "object") {
         _specialDeepExtend(source[key], targetValue, key, source);
-      } else {
+      } else if (!dontOverwriteKeysWithPlainValues) {
         source[key] = targetValue;
       }
     });
@@ -242,6 +276,7 @@ function _specialDeepExtend (source, target, parentKey, parent) {
       let matchingSourceItem = source.find(sourceItem => sourceItem.id === targetItem.id);
       if (matchingSourceItem) {
         _insertMissingKeyValuePairs(targetItem, matchingSourceItem);
+        _specialDeepExtend(targetItem, matchingSourceItem, undefined, undefined, true);
       }
     });
 

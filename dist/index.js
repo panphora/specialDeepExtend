@@ -316,7 +316,13 @@ var testSourceObjects = [{
       choices: []
     }]
   }]
-}];
+}, [{
+  id: "1",
+  children: [{
+    id: "2",
+    extraData: "h"
+  }]
+}]];
 var testTargetObjects = [{
   timelines: [{
     id: "1",
@@ -355,7 +361,12 @@ var testTargetObjects = [{
     id: "2",
     choiceText: "cccc"
   }]
-}];
+}, [{
+  id: "1",
+  children: [{
+    id: "2"
+  }]
+}]];
 var testExpectedOutputs = [{
   timelines: [{
     id: "1",
@@ -405,12 +416,20 @@ var testExpectedOutputs = [{
       choices: []
     }]
   }]
-}];
+}, [{
+  id: "1",
+  children: [{
+    id: "2",
+    extraData: "h"
+  }]
+}]];
 testSourceObjects.forEach(function (testSourceObject, i) {
   var testTargetObject = testTargetObjects[i];
   var testExpectedOutput = testExpectedOutputs[i];
   var output = specialDeepExtend(testSourceObject, testTargetObject);
   console.log("test ".concat(i, ":"), deepEqual(output, testExpectedOutput) ? "PASSED" : "FAILED");
+  console.log(1, JSON.stringify(output));
+  console.log(2, JSON.stringify(testExpectedOutput));
 }); // object with id 1 has the notes key added to it
 // object with id 2 is changed
 // object with id 3 is removed
@@ -431,7 +450,7 @@ function specialDeepExtend(sourceOriginal, targetOriginal) {
 } // this function will modify data, while the parent specialDeepExtend will not
 
 
-function _specialDeepExtend(source, target, parentKey, parent) {
+function _specialDeepExtend(source, target, parentKey, parent, dontOverwriteKeysWithPlainValues) {
   var sourceType = getDataType(source);
   var targetType = getDataType(target);
 
@@ -441,7 +460,7 @@ function _specialDeepExtend(source, target, parentKey, parent) {
 
       if (targetValueType === "array" || targetValueType === "object") {
         _specialDeepExtend(source[key], targetValue, key, source);
-      } else {
+      } else if (!dontOverwriteKeysWithPlainValues) {
         source[key] = targetValue;
       }
     });
@@ -455,6 +474,8 @@ function _specialDeepExtend(source, target, parentKey, parent) {
 
       if (matchingSourceItem) {
         _insertMissingKeyValuePairs(targetItem, matchingSourceItem);
+
+        _specialDeepExtend(targetItem, matchingSourceItem, undefined, undefined, true);
       }
     });
 
