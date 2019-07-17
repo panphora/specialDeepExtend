@@ -16,6 +16,7 @@ let findById = (arrayToSearch, objWithId) => arrayToSearch.find(a => a.id === ob
 
 
 // this will modify target, filling in data from source, using an `id` key to find matching objects inside arrays
+//   this function assumes source and target are of the same type (even in recursive loops)
 export default function specialDeepExtend (source, target) {
 
   if (isArray(target)) {

@@ -283,6 +283,7 @@ var findById = function findById(arrayToSearch, objWithId) {
     return a.id === objWithId.id;
   });
 }; // this will modify target, filling in data from source, using an `id` key to find matching objects inside arrays
+//   this function assumes source and target are of the same type (even in recursive loops)
 
 
 function specialDeepExtend(source, target) {
