@@ -37,11 +37,11 @@ if data 2 type === object
 
   loop through each key and value in the object 2
 
-    # case: object on object 1, but an array on object 2
+    # case: value can be an object in object 1, but an array on object 2
 
     if the current key is missing from object 1, copy it in from object 2
 
-    if the value is a NOT an array or object, overwrite object 1's value to match object 2's value
+    if the value is NOT an array or object, overwrite object 1's value to match object 2's value
       how? 
         object1[key] = object 2's value
 
@@ -53,7 +53,7 @@ if data 2 type === array
 
   # this can have objects
 
-  perform a deep copy the contents of the data 1 array
+  perform a deep copy of the contents of the data 1 array
 
   replace the contents of the original data 1 array with the contents of the data 2 array
     how?

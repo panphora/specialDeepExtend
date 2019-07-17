@@ -1,0 +1,50 @@
+get the type of the target data
+
+if array
+
+  loop through children of target data
+
+    for each child, find match in source data using the id
+
+      if source data found
+
+        fill missing keys in the target data using the source data
+        call this function recursively on the child and matching child
+
+if object
+
+  for each key/value pair in target data
+
+    if value is an object or array in BOTH the source AND target data
+
+      call this function recursively on these children
+  
+  for each key/value pair in source data
+
+    if key is missing from target data, fill it in with value from source
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

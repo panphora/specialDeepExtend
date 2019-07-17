@@ -246,10 +246,15 @@ function objEquiv(a, b, opts) {
   return typeof a === typeof b;
 }
 
-},{"./lib/keys.js":"node_modules/deep-equal/lib/keys.js","./lib/is_arguments.js":"node_modules/deep-equal/lib/is_arguments.js"}],"index.js":[function(require,module,exports) {
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+},{"./lib/keys.js":"node_modules/deep-equal/lib/keys.js","./lib/is_arguments.js":"node_modules/deep-equal/lib/is_arguments.js"}],"specialDeepExtend.js":[function(require,module,exports) {
+"use strict";
 
-var deepEqual = require('deep-equal');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = specialDeepExtend;
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 var isObject = function isObject(a) {
   return _typeof(a) === "object" && a !== null && !Array.isArray(a);
@@ -259,15 +264,68 @@ var isArray = function isArray(a) {
   return Array.isArray(a);
 };
 
-var getDataType = function getDataType(a) {
-  return isObject(a) ? "object" : isArray(a) ? "array" : "other";
-};
-
 var forEachKeyValuePair = function forEachKeyValuePair(obj, cb) {
   Object.keys(obj).forEach(function (k) {
     cb(k, obj[k]);
   });
 };
+
+var fillMissingKeys = function fillMissingKeys(target, source) {
+  forEachKeyValuePair(source, function (key, value) {
+    if (target[key] === undefined) {
+      target[key] = value;
+    }
+  });
+};
+
+var findById = function findById(arrayToSearch, objWithId) {
+  return arrayToSearch.find(function (a) {
+    return a.id === objWithId.id;
+  });
+}; // this will modify target, filling in data from source, using an `id` key to find matching objects inside arrays
+
+
+function specialDeepExtend(source, target) {
+  if (isArray(target)) {
+    // loop through children of target data
+    target.forEach(function (targetChild) {
+      // for each child, find match in source data using the id
+      var matchingSourceChild = findById(source, targetChild); // if source data found
+
+      if (matchingSourceChild) {
+        // fill missing keys in the target data using the source data
+        fillMissingKeys(targetChild, matchingSourceChild); // call this function recursively on the child and matching child
+
+        specialDeepExtend(targetChild, matchingSourceChild);
+      }
+    });
+  }
+
+  if (isObject(target)) {
+    // for each key/value pair in target data
+    forEachKeyValuePair(target, function (key, targetValue) {
+      // if value is an object or array in BOTH the source AND target data
+      var sourceValue = source[key];
+
+      if ((isObject(sourceValue) || isArray(sourceValue)) && (isObject(targetValue) || isArray(targetValue))) {
+        // call this function recursively on these children
+        specialDeepExtend(sourceValue, targetValue);
+      }
+    }); // fill missing keys in the target data using the source data
+
+    fillMissingKeys(target, source);
+  }
+
+  return target;
+}
+},{}],"tests.js":[function(require,module,exports) {
+"use strict";
+
+var _specialDeepExtend = _interopRequireDefault(require("./specialDeepExtend"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var deepEqual = require('deep-equal');
 
 var testSourceObjects = [{
   timelines: [{
@@ -367,7 +425,15 @@ var testTargetObjects = [{
     id: "2"
   }]
 }]];
-var testExpectedOutputs = [{
+var testExpectedOutputs = [// Explanation of the first expected output: 
+// - object with id 1 has the notes key added to it
+// - object with id 2 is changed
+// - object with id 3 is removed
+// - object with id 4 is added (to the end of the array)
+// - other prop is changed
+// - extra prop is added on
+// - not shown: nested data is also deep extended using specialDeepExtend
+{
   timelines: [{
     id: "1",
     text: "1",
@@ -426,75 +492,14 @@ var testExpectedOutputs = [{
 testSourceObjects.forEach(function (testSourceObject, i) {
   var testTargetObject = testTargetObjects[i];
   var testExpectedOutput = testExpectedOutputs[i];
-  var output = specialDeepExtend(testSourceObject, testTargetObject);
+  var output = (0, _specialDeepExtend.default)(testSourceObject, testTargetObject);
   console.log("test ".concat(i, ":"), deepEqual(output, testExpectedOutput) ? "PASSED" : "FAILED");
   console.log(1, JSON.stringify(output));
   console.log(2, JSON.stringify(testExpectedOutput));
-}); // object with id 1 has the notes key added to it
-// object with id 2 is changed
-// object with id 3 is removed
-// object with id 4 is added (to the end of the array)
-// other prop is changed
-// extra prop is added on
-// not shown: nested data is also deep extended using specialDeepExtend
-// specialDeepReplace uses ids to extend, add, or remove array items
-// # rules:
-//   - objects can contain arrays or strings in their keys
-//   - arrays can only contain objects, not strings or other primitives
+});
+},{"deep-equal":"node_modules/deep-equal/index.js","./specialDeepExtend":"specialDeepExtend.js"}],"index.js":[function(require,module,exports) {
+"use strict";
 
-function specialDeepExtend(sourceOriginal, targetOriginal) {
-  // copy the data, so it's not modified
-  sourceOriginal = JSON.parse(JSON.stringify(sourceOriginal));
-  targetOriginal = JSON.parse(JSON.stringify(targetOriginal));
-  return _specialDeepExtend(sourceOriginal, targetOriginal);
-} // this function will modify data, while the parent specialDeepExtend will not
-
-
-function _specialDeepExtend(source, target, parentKey, parent, dontOverwriteKeysWithPlainValues) {
-  var sourceType = getDataType(source);
-  var targetType = getDataType(target);
-
-  if (targetType === "object") {
-    forEachKeyValuePair(target, function (key, targetValue) {
-      var targetValueType = getDataType(targetValue);
-
-      if (targetValueType === "array" || targetValueType === "object") {
-        _specialDeepExtend(source[key], targetValue, key, source);
-      } else if (!dontOverwriteKeysWithPlainValues) {
-        source[key] = targetValue;
-      }
-    });
-
-    _insertMissingKeyValuePairs(source, target);
-  } else if (targetType === "array") {
-    target.forEach(function (targetItem) {
-      var matchingSourceItem = source.find(function (sourceItem) {
-        return sourceItem.id === targetItem.id;
-      });
-
-      if (matchingSourceItem) {
-        _insertMissingKeyValuePairs(targetItem, matchingSourceItem);
-
-        _specialDeepExtend(targetItem, matchingSourceItem, undefined, undefined, true);
-      }
-    });
-
-    if (parent) {
-      parent[parentKey] = target;
-    } else {
-      source = target;
-    }
-  }
-
-  return source;
-}
-
-function _insertMissingKeyValuePairs(target, source) {
-  forEachKeyValuePair(source, function (key, value) {
-    if (target[key] === undefined) {
-      target[key] = value;
-    }
-  });
-}
-},{"deep-equal":"node_modules/deep-equal/index.js"}]},{},["index.js"], null)
+require("./tests");
+},{"./tests":"tests.js"}]},{},["index.js"], null)
 //# sourceMappingURL=/index.js.map
