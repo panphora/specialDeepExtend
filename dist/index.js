@@ -294,10 +294,10 @@ function specialDeepExtend(source, target) {
       var matchingSourceChild = findById(source, targetChild); // if source data found
 
       if (matchingSourceChild) {
-        // fill missing keys in the target data using the source data
-        fillMissingKeys(targetChild, matchingSourceChild); // call this function recursively on the child and matching child
+        // call this function recursively on the child and matching child
+        specialDeepExtend(targetChild, matchingSourceChild); // fill missing keys in the target data using the source data
 
-        specialDeepExtend(targetChild, matchingSourceChild);
+        fillMissingKeys(targetChild, matchingSourceChild);
       }
     });
   }
