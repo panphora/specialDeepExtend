@@ -1,0 +1,89 @@
+assumptions / goals
+- code will pass in two objects or two arrays -- they will be of the same type
+- arrays should stay in the order they are in the target (second) object
+- arrays can have only objects inside of them
+- object keys can be equal to arrays, other objects, strings, or undefined
+- function will return a new object with data from both object 1 and object 2
+- array items in object 2 will be updated to match array items in object 1 with the same id
+
+
+
+# copy data so we don't modify the original object or array
+
+  ## TODO: this might not be necessary
+
+copy data 1
+copy data 2
+
+# see what type each data value is
+
+get type of data 1 
+get type of data 2
+
+# if both data are the same type, continue -- otherwise, change the data 1 type to be the data 2 type
+
+if data 1 type !== data 2 type
+  parent[parentKey] = {} or []
+  OR, if no parent:
+  data 1 = {} or []
+
+# check if the type is object
+
+if data 2 type === object
+  
+  # this can have key value pairs
+  # each key is a string
+  # each value is an object, array, string, or undefined (maybe)
+
+  loop through each key and value in the object 2
+
+    # case: object on object 1, but an array on object 2
+
+    if the current key is missing from object 1, copy it in from object 2
+
+    if the value is a NOT an array or object, overwrite object 1's value to match object 2's value
+      how? 
+        object1[key] = object 2's value
+
+    if the value is an object, call this current function on it (special deep extend), passing in the value in object 1, the value in object 2, the current key, AND object 1's data (parent)
+
+    if the value is an array, call this current function on it (special deep extend), passing in the value in object 1, the value in object 2, the current key, AND object 1's data (parent)
+
+if data 2 type === array
+
+  # this can have objects
+
+  perform a deep copy the contents of the data 1 array
+
+  replace the contents of the original data 1 array with the contents of the data 2 array
+    how?
+      arr1.splice(0, arr1.length, ...arr2)
+
+  for each item that's now in the data 1 array, call this current function on it (special deep extend) IF AND ONLY IF an object with the same id is found in the first level of data 1's deep copy
+
+    pass in the item in the object 1 array and the matching item in the object 1 deep copy
+    
+return object 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
